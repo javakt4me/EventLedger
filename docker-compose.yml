@@ -1,0 +1,70 @@
+version: '3.8'
+
+services:
+  account-service:
+    build:
+      context: .
+      dockerfile: account-service/Dockerfile
+    container_name: account-service
+    ports:
+      - "8081:8081"
+    environment:
+      - SPRING_APPLICATION_NAME=account-service
+      - SERVER_PORT=8081
+      - SPRING_DATASOURCE_URL=jdbc:h2:mem:accountdb
+      - SPRING_SLEUTH_TRACEID128=true
+      - SPRING_SLEUTH_PROPAGATION_TYPE=w3c,b3single
+      - SPRING_SLEUTH_SAMPLER_PROBABILITY=1.0
+      - MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE=health,metrics,info
+      - MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS=always
+    networks:
+      - event-ledger-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    labels:
+      - "com.example.description=Account Service for Transaction Management"
+
+  event-gateway:
+    build:
+      context: .
+      dockerfile: event-gateway/Dockerfile
+    container_name: event-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_APPLICATION_NAME=event-gateway
+      - SERVER_PORT=8080
+      - SPRING_DATASOURCE_URL=jdbc:h2:mem:gatewaydb
+      - SPRING_SLEUTH_TRACEID128=true
+      - SPRING_SLEUTH_PROPAGATION_TYPE=w3c,b3single
+      - SPRING_SLEUTH_SAMPLER_PROBABILITY=1.0
+      - MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE=health,metrics,info
+      - MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS=always
+      - RESILIENCE4J_CIRCUITBREAKER_INSTANCES_ACCOUNTSERVICE_FAILURETHRESHOLD=50
+      - RESILIENCE4J_CIRCUITBREAKER_INSTANCES_ACCOUNTSERVICE_SLOWCALLRATETHRESHOLD=50
+      - RESILIENCE4J_CIRCUITBREAKER_INSTANCES_ACCOUNTSERVICE_WAITDURATIONINOPENSTATE=10s
+      - RESILIENCE4J_RETRY_INSTANCES_ACCOUNTSERVICE_MAXATTEMPTS=3
+      - RESILIENCE4J_RETRY_INSTANCES_ACCOUNTSERVICE_WAITDURATION=500ms
+    networks:
+      - event-ledger-network
+    depends_on:
+      account-service:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    labels:
+      - "com.example.description=Event Gateway for API Management"
+
+networks:
+  event-ledger-network:
+    driver: bridge
+    name: event-ledger-network
+

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <property name="LOG_FILE" value="${LOG_FILE:-${LOG_PATH:-${LOG_TEMP:-${java.io.tmpdir:-/tmp}}/}spring.log}"/>
+
+    <!-- Console appender with JSON-like format -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>{"timestamp":"%d{ISO8601}","service":"account-service","level":"%level","logger":"%logger{36}","traceId":"%X{X-B3-TraceId}","message":"%msg"}%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Root logger -->
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+    </root>
+
+    <!-- Spring-specific loggers -->
+    <logger name="org.springframework" level="INFO"/>
+    <logger name="org.springframework.web" level="DEBUG"/>
+    <logger name="com.eventledger" level="DEBUG"/>
+    <logger name="org.springframework.cloud.sleuth" level="DEBUG"/>
+
+</configuration>
+
