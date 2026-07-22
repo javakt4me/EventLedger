@@ -125,5 +125,22 @@ class AccountControllerTest {
         verify(metrics, times(1)).recordBalanceCheck();
     }
 
-   
+
+
+    @Test
+    void testGetAccount() {
+        when(accountService.getAccount("acct-123"))
+                .thenReturn(accountResponse);
+
+        ResponseEntity<AccountResponse> response = accountController.getAccount("acct-123");
+
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(accountResponse, response.getBody());
+        assertEquals("acct-123", response.getBody().getAccountId());
+        assertEquals(1, response.getBody().getRecentTransactions().size());
+        verify(accountService, times(1)).getAccount("acct-123");
+    }
+
+
 }
