@@ -41,7 +41,27 @@ public class EventGatewayService {
         // Check for idempotency
         Optional<Event> existing = eventRepository.findByEventId(request.getEventId());
         if (existing.isPresent()) {
-            return convertToResponse(existing.get());
+            Event existingEvent = existing.get();
+            // If previously failed, allow reprocessing on resubmission
+            if (existingEvent.getStatus() == EventStatus.FAILED) {
+                try {
+                    accountServiceClient.processTransaction(request);
+                    existingEvent.setStatus(EventStatus.PROCESSED);
+                    eventRepository.save(existingEvent);
+                } catch (AccountServiceClient.ServiceUnavailableException ex) {
+                    // keep status FAILED and rethrow
+                    existingEvent.setStatus(EventStatus.FAILED);
+                    eventRepository.save(existingEvent);
+                    throw ex;
+                }
+                EventResponse resp = convertToResponse(existingEvent);
+                resp.setCreated(false);
+                return resp;
+            }
+
+            EventResponse resp = convertToResponse(existingEvent);
+            resp.setCreated(false);
+            return resp;
         }
 
         // Create and save the event
@@ -77,7 +97,9 @@ public class EventGatewayService {
             throw ex;
         }
 
-        return convertToResponse(savedEvent);
+        EventResponse response = convertToResponse(savedEvent);
+        response.setCreated(true);
+        return response;
     }
 
     public EventResponse getEvent(String eventId) {

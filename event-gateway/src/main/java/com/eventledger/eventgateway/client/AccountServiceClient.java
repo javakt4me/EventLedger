@@ -6,6 +6,7 @@ import io.github.resilience4j.retry.annotation.Retry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.client.HttpClientErrorException;
@@ -17,7 +18,10 @@ public class AccountServiceClient {
 
     private static final Logger logger = LoggerFactory.getLogger(AccountServiceClient.class);
     private final RestTemplate restTemplate;
-    private static final String ACCOUNT_SERVICE_URL = "http://localhost:8081";
+
+    // Read the downstream account service base URL from configuration. Default to docker-friendly hostname.
+    @Value("${account.service.url:http://account-service:8081}")
+    private String accountServiceUrl;
 
     public AccountServiceClient(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
@@ -26,7 +30,7 @@ public class AccountServiceClient {
     @CircuitBreaker(name = "accountService", fallbackMethod = "handleAccountServiceDown")
     @Retry(name = "accountService")
     public void processTransaction(EventRequest request) {
-        String url = ACCOUNT_SERVICE_URL + "/accounts/" + request.getAccountId() + "/transactions";
+        String url = accountServiceUrl + "/accounts/" + request.getAccountId() + "/transactions";
         logger.debug("Calling Account Service at: {} - Transaction will be traced across services", url);
         try {
             restTemplate.postForObject(url, request, Object.class);

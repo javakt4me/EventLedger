@@ -5,7 +5,7 @@
     <!-- Console appender with JSON-like format -->
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>{"timestamp":"%d{ISO8601}","service":"event-gateway","level":"%level","logger":"%logger{36}","traceId":"%X{X-B3-TraceId}","message":"%msg"}%n</pattern>
+            <pattern>{"timestamp":"%d{ISO8601}","service":"event-gateway","level":"%level","logger":"%logger{36}","traceId":"%X{traceId}","spanId":"%X{spanId}","message":"%msg"}%n</pattern>
         </encoder>
     </appender>
 

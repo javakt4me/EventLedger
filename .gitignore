@@ -1,0 +1,33 @@
+# Maven
+**/target/
+
+# IDEs
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+
+# Logs
+*.log
+test_output.log
+test_output.txt
+compile_test.log
+jacoco_report.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Backup/test folders
+**/test_backup/
+
+# Generated
+*.class
+
+# Docker
+docker-compose.override.yml
+
+# Others
+*.jar
+*.war

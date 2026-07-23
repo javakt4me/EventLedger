@@ -37,8 +37,12 @@ public class EventGatewayController {
             logger.debug("Creating event for account: {}", request.getAccountId());
             EventResponse response = eventGatewayService.createEvent(request);
             metrics.recordEventCreated();
-            logger.info("Event created successfully for account: {}", request.getAccountId());
-            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+            logger.info("Event processed for account: {} (created={})", request.getAccountId(), response.isCreated());
+            if (response.isCreated()) {
+                return ResponseEntity.status(HttpStatus.CREATED).body(response);
+            } else {
+                return ResponseEntity.ok(response);
+            }
         } catch (IllegalArgumentException ex) {
             metrics.recordEventError();
             logger.error("Validation error creating event: {}", ex.getMessage(), ex);

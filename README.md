@@ -59,7 +59,7 @@ The system consists of two independently deployable microservices:
 
 ## Prerequisites
 
-- Java 17 or higher
+- Java 8 (1.8) or higher
 - Maven 3.6+
 - Git (optional)
 
@@ -1093,6 +1093,8 @@ Run `mvn clean test jacoco:report` to generate detailed coverage reports.
 
 - **Framework**: Spring Boot 2.7.14
 - **Java Version**: 8+ (Java 1.8 compatible)
+  
+Note: The gateway contacts the Account Service using the property `account.service.url` (default `http://account-service:8081`). When running with Docker Compose do NOT set this to `localhost` — use the service hostname `account-service` so containers can reach each other.
 - **Database**: H2 (in-memory)
 - **Resiliency**: Resilience4j 1.7.1
 - **Testing**: JUnit 5, Mockito, Spring Test

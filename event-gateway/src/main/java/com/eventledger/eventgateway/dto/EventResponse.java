@@ -13,6 +13,7 @@ public class EventResponse {
     private Instant receivedAt;
     private String status;
     private String metadata;
+    private boolean created = false;
 
     public EventResponse() {
     }
@@ -101,6 +102,14 @@ public class EventResponse {
 
     public void setMetadata(String metadata) {
         this.metadata = metadata;
+    }
+
+    public boolean isCreated() {
+        return created;
+    }
+
+    public void setCreated(boolean created) {
+        this.created = created;
     }
 }
 
