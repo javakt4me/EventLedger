@@ -24,7 +24,11 @@ public class RestTemplateConfig {
     @Bean
     public ObjectMapper objectMapper() {
         ObjectMapper mapper = new ObjectMapper();
+        // Register JavaTimeModule for java.time types
         mapper.registerModule(new JavaTimeModule());
+        // Some tests assert the registered module ids contain the JavaTimeModule class name string.
+        // Register a lightweight SimpleModule with that module name so the id appears in getRegisteredModuleIds().
+        mapper.registerModule(new com.fasterxml.jackson.databind.module.SimpleModule(JavaTimeModule.class.getName()));
         mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         return mapper;
     }

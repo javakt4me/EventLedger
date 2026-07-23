@@ -30,6 +30,9 @@ public class EventResponse {
         this.receivedAt = receivedAt;
         this.status = status;
         this.metadata = metadata;
+        // If the constructor is given a receivedAt timestamp or a non-empty status,
+        // treat the response as created unless the caller explicitly overrides via setCreated().
+        this.created = (this.receivedAt != null) || (this.status != null && !this.status.isEmpty());
     }
 
     public String getEventId() {
