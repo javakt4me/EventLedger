@@ -1071,14 +1071,13 @@ kill -9 <PID>
 
 ## Code Coverage
 
-The project achieves **100% code coverage** with comprehensive unit and integration tests:
+The project has unit and integration test coverage across both services, measured
+with JaCoCo. `event-gateway` is covered more thoroughly than `account-service`;
+`HealthController`, `GlobalExceptionHandler`, and the `ErrorResponse` DTO in
+`account-service` are the weakest spots.
 
-- **Account Service**: 100% coverage
-- **Event Gateway**: 100% coverage
-- **Utilities**: 100% coverage
-- **Configurations**: 100% coverage
-
-Run `mvn clean test jacoco:report` to generate detailed coverage reports.
+Run `mvn clean test jacoco:report` and open `target/site/jacoco/index.html` in
+each module for current, exact numbers.
 
 ## Future Enhancements (Bonus Features)
 
